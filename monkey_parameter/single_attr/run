@@ -1,0 +1,3 @@
+#!/bin/sh
+RUBYLIB=lib puppet apply test.pp --debug
+getfattr -d /tmp/setattr
