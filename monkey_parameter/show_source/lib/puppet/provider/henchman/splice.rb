@@ -1,20 +1,20 @@
 Puppet::Type.type(:henchman).provide(:splice) do
   def exists?
     Puppet.debug "henchman going to work #{resource[:name]}"
-    victim = Puppet::Type.type(:file).properties
-    Puppet.debug("victim is #{victim.inspect}")
-    i = victim.find_index { |p| p.name == resource[:name] }
-    Puppet.debug "ooo #{victim[1]} #{victim[1].class}"
+    type = resource[:type].to_sym
+    prop = resource[:property].to_sym
+    victim = Puppet::Type.type(type).properties
+
+    Puppet.debug("victim property list is #{victim.inspect}")
+    i = victim.find_index { |p| p.name == prop }
+
     Puppet.debug "found our accomplice at #{i.inspect}"
 
-    i = 1
     move = victim[i]
     victim[i] = nil
     victim << move
     victim.compact!
-
-    victim = Puppet::Type.type(:file).properties
-    Puppet.debug("victim is #{victim.inspect}")
+    Puppet.debug("post-henchman victim property list is #{victim.inspect}")
     true
   end
 end
