@@ -18,15 +18,18 @@ Puppet::Type.type(:file).newproperty(:show_source) do
     attrs['user.puppet.line']     = resource.line.to_s
     attrs['user.puppet.resource'] = resource.to_s
     
+    #require 'pry'
+    #binding.pry()
     Puppet.debug("should #{attrs.inspect}")
     attrs
   end
 
   def retrieve
+    Puppet.debug("getting current state")
     attrs = {}
 
     props = `getfattr --absolute-names -d #{resource[:path]}`
-    props.to_a.grep(/^user\.puppet\./).each do | prop |
+    props.split("\n").grep(/^user\.puppet\./).each do | prop |
       prop.chomp!
       prop.gsub!(/"/, '')
       
