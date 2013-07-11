@@ -21,14 +21,12 @@ Puppet::Type.type(:file).newproperty(:extattr) do
 
   def set(value)
     Puppet.debug "setting #{value}"
-    attr_name, attr_value = value.split('=')
-    `/usr/bin/setfattr -n #{attr_name} -v #{attr_value} #{resource[:path]}`
+    @attr_name, @attr_value = value.split('=')
   end
 
   def flush
-    Puppet.debug "flushing"
-    attr_name, attr_value = resource[:extattr].split('=')
-    `/usr/bin/setfattr -n #{attr_name} -v #{attr_value} #{resource[:path]}`
+    Puppet.debug "flushing #{@attr_name} #{@attr_value}"
+    `/usr/bin/setfattr -n #{@attr_name} -v #{@attr_value} #{resource[:path]}`
   end
 
 end
