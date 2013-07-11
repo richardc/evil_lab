@@ -1,0 +1,4 @@
+#!/bin/sh
+rm /tmp/show_source
+RUBYLIB=lib puppet apply test.pp --debug
+getfattr -d /tmp/show_source
