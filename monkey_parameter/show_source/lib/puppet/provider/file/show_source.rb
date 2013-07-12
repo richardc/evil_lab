@@ -12,7 +12,7 @@ Puppet::Type.type(:file).newproperty(:show_source) do
 
   def puppet_attributes
     attrs = {
-      'user.puppet.file' => resource.file,
+      'user.puppet.file' => resource.file || "from_apply",
       'user.puppet.line' => resource.line.to_s,
       'user.puppet.resource' => resource.to_s,
     }
@@ -22,12 +22,12 @@ Puppet::Type.type(:file).newproperty(:show_source) do
   end
 
   def retrieve
-    Puppet.debug("getting current state")
+    Puppet.debug "getting current state" 
     attrs = {}
     puppet_attributes.keys.each do |name|
       attrs[name] = `/usr/bin/getfattr --only-values -n #{name} #{resource[:path]} 2>/dev/null`.chomp
     end
-    Puppet.debug "retireved #{attrs.inspect}"
+    Puppet.debug "retrieved #{attrs.inspect}"
 
     attrs == puppet_attributes
   end
