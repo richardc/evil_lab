@@ -12,9 +12,10 @@ Puppet::Type.type(:file).newproperty(:show_source) do
 
   def puppet_attributes
     attrs = {
-      'user.puppet.file' => resource.file || "from_apply",
-      'user.puppet.line' => resource.line.to_s,
+      'user.puppet.file'     => resource.file || "from_apply",
+      'user.puppet.line'     => resource.line.to_s,
       'user.puppet.resource' => resource.to_s,
+      'user.puppet.path'     => resource.path,
     }
 
     Puppet.debug("should #{attrs.inspect}")
