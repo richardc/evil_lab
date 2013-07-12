@@ -25,7 +25,7 @@ Puppet::Type.type(:file).newproperty(:show_source) do
     Puppet.debug("getting current state")
     attrs = {}
     puppet_attributes.keys.each do |name|
-      attrs[name] = `/usr/sbin/getfattr --only-values -n #{name} #{resource[:path]} 2> /dev/null`.chomp
+      attrs[name] = `/usr/bin/getfattr --only-values -n #{name} #{resource[:path]} 2>/dev/null`.chomp
     end
     Puppet.debug "retireved #{attrs.inspect}"
 
@@ -40,7 +40,7 @@ Puppet::Type.type(:file).newproperty(:show_source) do
       if should
         `/usr/bin/setfattr -n #{name} -v #{value} #{resource[:path]}`
       else
-        `/usr/bin/setfattr --renome #{name}`
+        `/usr/bin/setfattr --remove #{name}`
       end
     end
   end
