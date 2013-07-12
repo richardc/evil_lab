@@ -9,17 +9,14 @@ Puppet::Type.type(:file).newproperty(:show_source) do
     }
 
   "
-  ##############################################
 
-  def should
-    attrs = {}
+  def puppet_attributes
+    attrs = {
+      'user.puppet.file' => resource.file,
+      'user.puppet.line' => resource.line.to_s,
+      'user.puppet.resource' => resource.to_s,
+    }
 
-    attrs['user.puppet.file']     = resource.file
-    attrs['user.puppet.line']     = resource.line.to_s
-    attrs['user.puppet.resource'] = resource.to_s
-    
-    #require 'pry'
-    #binding.pry()
     Puppet.debug("should #{attrs.inspect}")
     attrs
   end
@@ -27,36 +24,24 @@ Puppet::Type.type(:file).newproperty(:show_source) do
   def retrieve
     Puppet.debug("getting current state")
     attrs = {}
-
-    props = `getfattr --absolute-names -d #{resource[:path]}`
-    props.split("\n").grep(/^user\.puppet\./).each do | prop |
-      prop.chomp!
-      prop.gsub!(/"/, '')
-      
-      attr_name, attr_value = prop.split('=')
-      attrs[attr_name] = attr_value
+    puppet_attributes.keys.each do |name|
+      attrs[name] = `/usr/sbin/getfattr --only-values -n #{name} #{resource[:path]} 2> /dev/null`.chomp
     end
-  
-    Puppet.debug "retrieve #{attrs.inspect}"
+    Puppet.debug "retireved #{attrs.inspect}"
 
-    attrs
+    attrs == puppet_attributes
   end
 
   def set(props)
-    Puppet.debug "set #{props.inspect}"
+  end
 
-    props.each do |name,value|
-      if props
-         `/usr/bin/setfattr -n #{name} -v #{value} #{resource[:path]}`
+  def flush
+    puppet_attributes.each do |name,value|
+      if should
+        `/usr/bin/setfattr -n #{name} -v #{value} #{resource[:path]}`
+      else
+        `/usr/bin/setfattr --renome #{name}`
       end
     end
-  end
-
-  def is_to_s(it)
-    it.inspect
-  end
-
-  def should_to_s(it)
-    it.inspect
   end
 end
